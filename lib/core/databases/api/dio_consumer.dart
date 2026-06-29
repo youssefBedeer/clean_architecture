@@ -1,4 +1,4 @@
-import 'package:clean_architecture/core/errors/expentions.dart';
+import 'package:clean_architecture/core/errors/exeptions.dart';
 import 'package:dio/dio.dart';
 import 'api_consumer.dart';
 import 'end_points.dart';

@@ -1,8 +1,8 @@
 class EndPoints {
-  static const String baserUrl = "https://jsonplaceholder.typicode.com/";
+  static const String baserUrl = "https://youssefbedeer.free.beeceptor.com/";
   static const String template = "template/";
-  static const String user = "users/";
-  static const String post = "posts/";
+  static const String users = "users/";
+  // static const String post = "posts/";
 }
 
 class ApiKey {
