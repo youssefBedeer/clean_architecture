@@ -1,0 +1,839 @@
+Project Structure Template inside lib
+==================================
+
+lib/
+  .dart_tool/dartpad/web_plugin_registrant.dart
+  .dart_tool/flutter_build/b11a7fa7c467f5d086095facee5497de/main.dart
+  .dart_tool/flutter_build/b11a7fa7c467f5d086095facee5497de/web_plugin_registrant.dart
+  lib/core/connection/network_info.dart
+  lib/core/databases/api/api_consumer.dart
+  lib/core/databases/api/dio_consumer.dart
+  lib/core/databases/api/end_points.dart
+  lib/core/databases/cache/cache_helper.dart
+  lib/core/errors/error_model.dart
+  lib/core/errors/exeptions.dart
+  lib/core/errors/failure.dart
+  lib/core/params/params.dart
+  lib/features/user/data/data_resources/user_local_data_source.dart
+  lib/features/user/data/data_resources/user_remote_data_source.dart
+  lib/features/user/data/models/sub_models/address_model.dart
+  lib/features/user/data/models/sub_models/company_model.dart
+  lib/features/user/data/models/sub_models/geo_model.dart
+  lib/features/user/data/models/user_model.dart
+  lib/features/user/data/repositories/user_repository_implementaion.dart
+  lib/features/user/domain/entities/sub_entities/address_entity.dart
+  lib/features/user/domain/entities/sub_entities/geo_entity.dart
+  lib/features/user/domain/entities/user_entity.dart
+  lib/features/user/domain/repositories/user_repository.dart
+  lib/features/user/domain/usecases/get_user.dart
+  lib/features/user/presentaion/riverpod/user_riverpod.dart
+  lib/features/user/presentaion/riverpod/user_state.dart
+  lib/features/user/presentaion/screens/user_screen.dart
+  lib/main.dart
+
+Copy of source code for each file:
+==================================
+
+--- BEGIN .dart_tool/dartpad/web_plugin_registrant.dart ---
+// Flutter web plugin registrant file.
+//
+// Generated file. Do not edit.
+//
+
+// @dart = 2.13
+// ignore_for_file: type=lint
+
+import 'package:shared_preferences_web/shared_preferences_web.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+
+void registerPlugins([final Registrar? pluginRegistrar]) {
+  final Registrar registrar = pluginRegistrar ?? webPluginRegistrar;
+  SharedPreferencesPlugin.registerWith(registrar);
+  registrar.registerMessageHandler();
+}
+
+--- END .dart_tool/dartpad/web_plugin_registrant.dart ---
+
+--- BEGIN .dart_tool/flutter_build/b11a7fa7c467f5d086095facee5497de/main.dart ---
+// @dart=3.12
+// Flutter web bootstrap script for package:clean_architecture/main.dart.
+//
+// Generated file. Do not edit.
+//
+
+// ignore_for_file: type=lint
+
+import 'dart:ui_web' as ui_web;
+import 'dart:async';
+
+import 'package:clean_architecture/main.dart' as entrypoint;
+import 'web_plugin_registrant.dart' as pluginRegistrant;
+
+typedef _UnaryFunction = dynamic Function(List<String> args);
+typedef _NullaryFunction = dynamic Function();
+
+Future<void> main() async {
+  await ui_web.bootstrapEngine(
+    runApp: () {
+      if (entrypoint.main is _UnaryFunction) {
+        return (entrypoint.main as _UnaryFunction)(<String>[]);
+      }
+      return (entrypoint.main as _NullaryFunction)();
+    },
+    registerPlugins: () {
+      pluginRegistrant.registerPlugins();
+    },
+  );
+}
+
+--- END .dart_tool/flutter_build/b11a7fa7c467f5d086095facee5497de/main.dart ---
+
+--- BEGIN .dart_tool/flutter_build/b11a7fa7c467f5d086095facee5497de/web_plugin_registrant.dart ---
+// Flutter web plugin registrant file.
+//
+// Generated file. Do not edit.
+//
+
+// @dart = 2.13
+// ignore_for_file: type=lint
+
+import 'package:shared_preferences_web/shared_preferences_web.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+
+void registerPlugins([final Registrar? pluginRegistrar]) {
+  final Registrar registrar = pluginRegistrar ?? webPluginRegistrar;
+  SharedPreferencesPlugin.registerWith(registrar);
+  registrar.registerMessageHandler();
+}
+
+--- END .dart_tool/flutter_build/b11a7fa7c467f5d086095facee5497de/web_plugin_registrant.dart ---
+
+--- BEGIN lib/core/connection/network_info.dart ---
+//!data_connection_checker_tv
+import 'package:data_connection_checker_tv/data_connection_checker.dart';
+
+abstract class NetworkInfo {
+  Future<bool>? get isConnected;
+}
+
+class NetworkInfoImpl implements NetworkInfo {
+  final DataConnectionChecker connectionChecker;
+
+  NetworkInfoImpl(this.connectionChecker);
+
+  @override
+  Future<bool> get isConnected => connectionChecker.hasConnection;
+}
+
+--- END lib/core/connection/network_info.dart ---
+
+--- BEGIN lib/core/databases/api/api_consumer.dart ---
+abstract class ApiConsumer {
+  Future<dynamic> get(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+  });
+  Future<dynamic> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    bool isFormData = false,
+  });
+  Future<dynamic> patch(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    bool isFormData = false,
+  });
+  Future<dynamic> delete(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+  });
+}
+
+--- END lib/core/databases/api/api_consumer.dart ---
+
+--- BEGIN lib/core/databases/api/dio_consumer.dart ---
+import 'package:clean_architecture/core/errors/exeptions.dart';
+import 'package:dio/dio.dart';
+import 'api_consumer.dart';
+import 'end_points.dart';
+
+class DioConsumer extends ApiConsumer {
+  final Dio dio;
+
+  DioConsumer({required this.dio}) {
+    dio.options.baseUrl = EndPoints.baserUrl;
+  }
+
+//!POST
+  @override
+  Future post(String path,
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      bool isFormData = false}) async {
+    try {
+      dio.post(
+        path,
+        data: isFormData ? FormData.fromMap(data) : data,
+        queryParameters: queryParameters,
+      );
+    } on DioException catch (e) {
+      handleDioException(e);
+    }
+  }
+
+//!GET
+  @override
+  Future get(String path,
+      {Object? data, Map<String, dynamic>? queryParameters}) async {
+    try {
+      var res =
+          await dio.get(path, data: data, queryParameters: queryParameters);
+      return res.data;
+    } on DioException catch (e) {
+      handleDioException(e);
+    }
+  }
+
+//!DELETE
+  @override
+  Future delete(String path,
+      {Object? data, Map<String, dynamic>? queryParameters}) async {
+    try {
+      var res = await dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+      );
+      return res.data;
+    } on DioException catch (e) {
+      handleDioException(e);
+    }
+  }
+
+//!PATCH
+  @override
+  Future patch(String path,
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      bool isFormData = false}) async {
+    try {
+      var res = await dio.patch(
+        path,
+        data: isFormData ? FormData.fromMap(data) : data,
+        queryParameters: queryParameters,
+      );
+      return res.data;
+    } on DioException catch (e) {
+      handleDioException(e);
+    }
+  }
+}
+
+--- END lib/core/databases/api/dio_consumer.dart ---
+
+--- BEGIN lib/core/databases/api/end_points.dart ---
+class EndPoints {
+  static const String baserUrl = "https://youssefbedeer.free.beeceptor.com/";
+  static const String template = "template/";
+  static const String users = "users/";
+  // static const String post = "posts/";
+}
+
+class ApiKey {
+  static String id = "id";
+  static String name = "name";
+  static String username = "username";
+  static String email = "email";
+  static String address = "address";
+  static String street = "street";
+  static String suite = "suite";
+  static String city = "city";
+  static String zipcode = "zipcode";
+  static String geo = "geo";
+  static String lat = "lat";
+  static String lng = "lng";
+  static String phone = "phone";
+  static String website = "website";
+  static String company = "company";
+  static String catchPhrase = "catchPhrase";
+  static String bs = "bs";
+}
+
+--- END lib/core/databases/api/end_points.dart ---
+
+--- BEGIN lib/core/databases/cache/cache_helper.dart ---
+
+import 'package:shared_preferences/shared_preferences.dart';
+
+class CacheHelper {
+ static late SharedPreferences sharedPreferences;
+
+//! Here The Initialize of cache .
+  init() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+//! this method to put data in local database using key
+
+  String? getDataString({
+    required String key,
+  }) {
+    return sharedPreferences.getString(key);
+  }
+
+//! this method to put data in local database using key
+
+  Future<bool> saveData({required String key, required dynamic value}) async {
+    if (value is bool) {
+      return await sharedPreferences.setBool(key, value);
+    }
+    if (value is String) {
+      return await sharedPreferences.setString(key, value);
+    }
+
+    if (value is int) {
+      return await sharedPreferences.setInt(key, value);
+    } else {
+      return await sharedPreferences.setDouble(key, value);
+    }
+  }
+
+//! this method to get data already saved in local database
+
+  dynamic getData({required String key}) {
+    return sharedPreferences.get(key);
+  }
+
+//! remove data using specific key
+
+  Future<bool> removeData({required String key}) async {
+    return await sharedPreferences.remove(key);
+  }
+
+//! this method to check if local database contains {key}
+  Future<bool> containsKey({required String key}) async {
+    return sharedPreferences.containsKey(key);
+  }
+
+//! clear all data in the local database
+  Future<bool> clearData() async {
+    return await sharedPreferences.clear();
+  }
+
+//! this method to put data in local database using key
+  Future<dynamic> put({
+    required String key,
+    required dynamic value,
+  }) async {
+    if (value is String) {
+      return await sharedPreferences.setString(key, value);
+    } else if (value is bool) {
+      return await sharedPreferences.setBool(key, value);
+    } else {
+      return await sharedPreferences.setInt(key, value);
+    }
+  }
+}
+
+--- END lib/core/databases/cache/cache_helper.dart ---
+
+--- BEGIN lib/core/errors/error_model.dart ---
+class ErrorModel {
+  final int status;
+  final String errorMessage;
+
+  ErrorModel({required this.status, required this.errorMessage});
+  factory ErrorModel.fromJson(Map jsonData) {
+    return ErrorModel(
+      errorMessage: jsonData["Message"],
+      status: jsonData["status"],
+    );
+  }
+}
+
+--- END lib/core/errors/error_model.dart ---
+
+--- BEGIN lib/core/errors/exeptions.dart ---
+import 'package:dio/dio.dart';
+import 'error_model.dart';
+
+//!ServerException
+class ServerException implements Exception {
+  final ErrorModel errorModel;
+  ServerException(this.errorModel);
+}
+//!CacheExeption
+class CacheExeption implements Exception {
+  final String errorMessage;
+  CacheExeption({required this.errorMessage});
+}
+
+class BadCertificateException extends ServerException {
+  BadCertificateException(super.errorModel);
+}
+
+class ConnectionTimeoutException extends ServerException {
+  ConnectionTimeoutException(super.errorModel);
+}
+
+class BadResponseException extends ServerException {
+  BadResponseException(super.errorModel);
+}
+
+class ReceiveTimeoutException extends ServerException {
+  ReceiveTimeoutException(super.errorModel);
+}
+
+class ConnectionErrorException extends ServerException {
+  ConnectionErrorException(super.errorModel);
+}
+
+class SendTimeoutException extends ServerException {
+  SendTimeoutException(super.errorModel);
+}
+
+class UnauthorizedException extends ServerException {
+  UnauthorizedException(super.errorModel);
+}
+
+class ForbiddenException extends ServerException {
+  ForbiddenException(super.errorModel);
+}
+
+class NotFoundException extends ServerException {
+  NotFoundException(super.errorModel);
+}
+
+class CofficientException extends ServerException {
+  CofficientException(super.errorModel);
+}
+
+class CancelException extends ServerException {
+  CancelException(super.errorModel);
+}
+
+class UnknownException extends ServerException {
+  UnknownException(super.errorModel);
+}
+
+handleDioException(DioException e) {
+  switch (e.type) {
+    case DioExceptionType.connectionError:
+      throw ConnectionErrorException(ErrorModel.fromJson(e.response!.data));
+    case DioExceptionType.badCertificate:
+      throw BadCertificateException(ErrorModel.fromJson(e.response!.data));
+    case DioExceptionType.connectionTimeout:
+      throw ConnectionTimeoutException(ErrorModel.fromJson(e.response!.data));
+
+    case DioExceptionType.receiveTimeout:
+      throw ReceiveTimeoutException(ErrorModel.fromJson(e.response!.data));
+
+    case DioExceptionType.sendTimeout:
+      throw SendTimeoutException(ErrorModel.fromJson(e.response!.data));
+
+    case DioExceptionType.badResponse:
+      switch (e.response?.statusCode) {
+        case 400: // Bad request
+
+          throw BadResponseException(ErrorModel.fromJson(e.response!.data));
+
+        case 401: //unauthorized
+          throw UnauthorizedException(ErrorModel.fromJson(e.response!.data));
+
+        case 403: //forbidden
+          throw ForbiddenException(ErrorModel.fromJson(e.response!.data));
+
+        case 404: //not found
+          throw NotFoundException(ErrorModel.fromJson(e.response!.data));
+
+        case 409: //cofficient
+
+          throw CofficientException(ErrorModel.fromJson(e.response!.data));
+
+        case 504: // Bad request
+
+          throw BadResponseException(
+              ErrorModel(status: 504, errorMessage: e.response!.data));
+      }
+
+    case DioExceptionType.cancel:
+      throw CancelException(
+          ErrorModel(errorMessage: e.toString(), status: 500));
+
+    case DioExceptionType.unknown:
+      throw UnknownException(
+          ErrorModel(errorMessage: e.toString(), status: 500));
+  }
+}
+
+--- END lib/core/errors/exeptions.dart ---
+
+--- BEGIN lib/core/errors/failure.dart ---
+class Failure {
+  final String errMessage;
+  Failure({required this.errMessage});
+}
+
+--- END lib/core/errors/failure.dart ---
+
+--- BEGIN lib/core/params/params.dart ---
+class TemplateParams {
+  final String id;
+  TemplateParams({required this.id});
+}
+
+class UserParams {
+  final String id;
+  UserParams({required this.id});
+}
+
+class PostParams {
+  final String id;
+  PostParams({required this.id});
+}
+
+--- END lib/core/params/params.dart ---
+
+--- BEGIN lib/features/user/data/data_resources/user_local_data_source.dart ---
+import 'dart:convert';
+
+import 'package:clean_architecture/core/databases/cache/cache_helper.dart';
+import 'package:clean_architecture/core/errors/exeptions.dart';
+import 'package:clean_architecture/features/user/data/models/user_model.dart';
+
+class UserLocalDataSource {
+  final CacheHelper cache;
+  final String key = "CachedUser";
+  UserLocalDataSource({required this.cache});
+
+  void cacheUser(UserModel? userToCache) {
+    if (userToCache != null) {
+      cache.saveData(key: key, value: json.encode(userToCache.toJson()));
+    } else {
+      throw CacheExeption(errorMessage: "No Internet Connection");
+    }
+  }
+
+  Future<UserModel> getLastUser() {
+    final jsonString = cache.getDataString(key: key);
+
+    if (jsonString != null) {
+      return Future.value(UserModel.fromJson(json.decode(jsonString)));
+    } else {
+      throw CacheExeption(errorMessage: "No Internet Connection");
+    }
+  }
+}
+
+--- END lib/features/user/data/data_resources/user_local_data_source.dart ---
+
+--- BEGIN lib/features/user/data/data_resources/user_remote_data_source.dart ---
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:clean_architecture/core/databases/api/api_consumer.dart';
+import 'package:clean_architecture/core/databases/api/end_points.dart';
+import 'package:clean_architecture/core/params/params.dart';
+import 'package:clean_architecture/features/user/data/models/user_model.dart';
+
+class UserRemoteDataSource {
+  final ApiConsumer api; 
+  UserRemoteDataSource({
+    required this.api,
+  });
+  Future<UserModel> getUser(UserParams params) async {
+    final response = await api.get("${EndPoints.users}/${params.id}"); 
+    return UserModel.fromJson(response);
+  }
+}
+
+--- END lib/features/user/data/data_resources/user_remote_data_source.dart ---
+
+--- BEGIN lib/features/user/data/models/sub_models/address_model.dart ---
+import 'package:clean_architecture/core/databases/api/end_points.dart';
+import 'package:clean_architecture/features/user/domain/entities/sub_entities/address_entity.dart';
+
+class AddressModel extends AddressEntity{
+  AddressModel({required super.suite, required super.city, required super.zipcode, required super.geo});
+
+  factory AddressModel.fromJson(Map<String, dynamic> json) {
+    return AddressModel(
+      suite: json[ApiKey.suite],
+      city: json[ApiKey.city],
+      zipcode: json[ApiKey.zipcode],
+      geo: json[ApiKey.geo]
+    );
+  }
+
+  Map<String, dynamic> toJson(){
+    return {
+      ApiKey.suite: suite, 
+      ApiKey.city: city, 
+      ApiKey.zipcode: zipcode, 
+      ApiKey.geo: geo
+    };
+  }
+}
+
+--- END lib/features/user/data/models/sub_models/address_model.dart ---
+
+--- BEGIN lib/features/user/data/models/sub_models/company_model.dart ---
+import 'package:clean_architecture/core/databases/api/end_points.dart';
+
+class CompanyModel {
+  final String name;
+  final String catchPhrase;
+  final String bs;
+
+  CompanyModel({
+    required this.name,
+    required this.catchPhrase,
+    required this.bs,
+  });
+
+  factory CompanyModel.fromJson(Map<String, dynamic> json) {
+    return CompanyModel(
+      name: ApiKey.name,
+      catchPhrase: ApiKey.catchPhrase,
+      bs: ApiKey.bs,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {ApiKey.name: name, ApiKey.catchPhrase: catchPhrase, ApiKey.bs: bs};
+  }
+}
+
+--- END lib/features/user/data/models/sub_models/company_model.dart ---
+
+--- BEGIN lib/features/user/data/models/sub_models/geo_model.dart ---
+import 'package:clean_architecture/features/user/domain/entities/sub_entities/geo_entity.dart';
+
+class GeoModel extends GeoEntity{
+  GeoModel({required super.lat, required super.lng});
+
+}
+
+--- END lib/features/user/data/models/sub_models/geo_model.dart ---
+
+--- BEGIN lib/features/user/data/models/user_model.dart ---
+
+
+import 'package:clean_architecture/core/databases/api/end_points.dart';
+import 'package:clean_architecture/features/user/data/models/sub_models/address_model.dart';
+import 'package:clean_architecture/features/user/data/models/sub_models/company_model.dart';
+import 'package:clean_architecture/features/user/domain/entities/user_entity.dart';
+
+class UserModel extends UserEntity {
+  final int id;
+  final String username;
+  final String website;
+  final CompanyModel company;
+  UserModel({
+    required this.id,
+    required super.name,
+    required super.phone,
+    required super.email,
+    required super.address,
+    required this.username,
+    required this.website,
+    required this.company,
+  });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json[ApiKey.id],
+      name: json[ApiKey.name],
+      phone: json[ApiKey.phone],
+      email: json[ApiKey.email],
+      username: json[ApiKey.username],
+      website: json[ApiKey.website],
+      address: AddressModel.fromJson(json[ApiKey.address]),
+      company: CompanyModel.fromJson(json[ApiKey.company]),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      ApiKey.id: id,
+      ApiKey.name: name,
+      ApiKey.email: email,
+      ApiKey.phone: phone,
+      ApiKey.username: username,
+      ApiKey.website: website,
+      ApiKey.company: company,
+      ApiKey.address: address,
+    };
+  }
+}
+
+--- END lib/features/user/data/models/user_model.dart ---
+
+--- BEGIN lib/features/user/data/repositories/user_repository_implementaion.dart ---
+import 'package:clean_architecture/core/connection/network_info.dart';
+import 'package:clean_architecture/core/errors/exeptions.dart';
+import 'package:clean_architecture/core/errors/failure.dart';
+import 'package:clean_architecture/core/params/params.dart';
+import 'package:clean_architecture/features/user/data/data_resources/user_local_data_source.dart';
+import 'package:clean_architecture/features/user/data/data_resources/user_remote_data_source.dart';
+import 'package:clean_architecture/features/user/domain/entities/user_entity.dart';
+import 'package:clean_architecture/features/user/domain/repositories/user_repository.dart';
+import 'package:dartz/dartz.dart';
+
+class UserRepositoryImpl extends UserRepository {
+  final NetworkInfo networkInfo;
+  final UserRemoteDataSource remoteDataSource;
+  final UserLocalDataSource localDataSource;
+  UserRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+    required this.networkInfo,
+  });
+  @override
+  Future<Either<Failure, UserEntity>> getUser({
+    required UserParams params,
+  }) async {
+    if (await networkInfo.isConnected!) {
+      try {
+        final remoteUser = await remoteDataSource.getUser(params);
+        localDataSource.cacheUser(remoteUser);
+        return Right(remoteUser);
+      } on ServerException catch (e) {
+        return Left(Failure(errMessage: e.errorModel.errorMessage));
+      }
+    } else {
+      try {
+        final localUser = await localDataSource.getLastUser();
+        return Right(localUser);
+      } on CacheExeption catch (e) {
+        return Left(Failure(errMessage: e.errorMessage));
+      }
+    }
+  }
+}
+
+--- END lib/features/user/data/repositories/user_repository_implementaion.dart ---
+
+--- BEGIN lib/features/user/domain/entities/sub_entities/address_entity.dart ---
+import 'package:clean_architecture/features/user/domain/entities/sub_entities/geo_entity.dart';
+
+class AddressEntity {
+  final String suite;
+  final String city;
+  final String zipcode;
+  final GeoEntity geo;
+  AddressEntity({
+    required this.suite,
+    required this.city,
+    required this.zipcode,
+    required this.geo,
+  });
+}
+
+--- END lib/features/user/domain/entities/sub_entities/address_entity.dart ---
+
+--- BEGIN lib/features/user/domain/entities/sub_entities/geo_entity.dart ---
+class GeoEntity {
+  final String lat;
+  final String lng;
+  GeoEntity({required this.lat, required this.lng});
+}
+
+--- END lib/features/user/domain/entities/sub_entities/geo_entity.dart ---
+
+--- BEGIN lib/features/user/domain/entities/user_entity.dart ---
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:clean_architecture/features/user/domain/entities/sub_entities/address_entity.dart';
+
+class UserEntity {
+  final String name;
+  final String phone;
+  final String email; 
+  final AddressEntity address;
+
+  UserEntity({
+    required this.name,
+    required this.phone,
+    required this.email,
+    required this.address,
+  });
+}
+
+
+
+
+
+--- END lib/features/user/domain/entities/user_entity.dart ---
+
+--- BEGIN lib/features/user/domain/repositories/user_repository.dart ---
+import 'package:clean_architecture/core/errors/failure.dart';
+import 'package:clean_architecture/core/params/params.dart';
+import 'package:clean_architecture/features/user/domain/entities/user_entity.dart';
+import 'package:dartz/dartz.dart';
+
+abstract class UserRepository {
+  Future<Either<Failure, UserEntity>> getUser({required UserParams params});
+}
+
+--- END lib/features/user/domain/repositories/user_repository.dart ---
+
+--- BEGIN lib/features/user/domain/usecases/get_user.dart ---
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:clean_architecture/core/errors/failure.dart';
+import 'package:clean_architecture/core/params/params.dart';
+import 'package:clean_architecture/features/user/domain/entities/user_entity.dart';
+import 'package:clean_architecture/features/user/domain/repositories/user_repository.dart';
+import 'package:dartz/dartz.dart';
+
+class GetUser {
+  final UserRepository repository; 
+  GetUser({
+    required this.repository,
+  });
+
+  Future<Either<Failure, UserEntity>> call({required UserParams params}) {
+    return repository.getUser(params: params);
+  }
+  
+}
+
+--- END lib/features/user/domain/usecases/get_user.dart ---
+
+--- BEGIN lib/features/user/presentaion/riverpod/user_riverpod.dart ---
+
+--- END lib/features/user/presentaion/riverpod/user_riverpod.dart ---
+
+--- BEGIN lib/features/user/presentaion/riverpod/user_state.dart ---
+
+--- END lib/features/user/presentaion/riverpod/user_state.dart ---
+
+--- BEGIN lib/features/user/presentaion/screens/user_screen.dart ---
+
+--- END lib/features/user/presentaion/screens/user_screen.dart ---
+
+--- BEGIN lib/main.dart ---
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MainApp());
+}
+
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Hello World!'),
+        ),
+      ),
+    );
+  }
+}
+
+--- END lib/main.dart ---
+
